@@ -18,7 +18,7 @@ def fetch_weather_data(cache, city, key):
     
         data = responses.json() #Is what the api replied, parsed.
 
-        if "error" not in data: #If we used the response 200 method, it won't catch invalid city names because the API is called successfully, no matter whats returned
+        if "error" not in data: #If used the response 200 method, it won't catch invalid city names because the API is called successfully, no matter whats returned
 
             cache[city] = data
 
@@ -85,7 +85,7 @@ def clear_cache():
         json.dump({}, file, indent=2)
 
 def ensure_cache_file():
-    # if cache.json doesn't exist, create with {}
+    # if cache.json doesn't exist, create with {} 
     if not os.path.exists("cache.json"):
         with open("cache.json", "w") as file:
             json.dump({}, file, indent=2)
