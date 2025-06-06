@@ -8,18 +8,53 @@ import requests
 
 #Core functions
 
-def fetch_weather_data(city, key):
+def fetch_weather_data(cache, city, key):
     # build API request with city and key
-    # send request, parse JSON, return dict
-    pass
+        # send request, parse JSON, return dict
+        
+    try:
+        urls = f"https://api.weatherapi.com/v1/current.json?key={key}&q={city}" #Is the url the request is going to
+        responses = requests.get(urls) #Is sending the request to the url
+    
+        data = responses.json() #Is what the api replied, parsed.
+
+        if "error" not in data: #If we used the response 200 method, it won't catch invalid city names because the API is called successfully, no matter whats returned
+
+            cache[city] = data
+
+            with open("cache.json", "w") as file:
+                json.dump(cache, file, indent=2)
+        
+        else:
+            print("Error, invalid city name.")
+            
+    
+    except Exception as e:
+        print(f"Error occured, {e}")
 
 def display_weather(weather):
-    # extract and print weather info cleanly
-    pass
+    city = weather["location"]["name"]
+    region = weather["location"]["region"]
+    country = weather["location"]["country"]
+    localtime = weather["location"]["localtime"]
 
-def save_weather(cache, city):
-    # update cache[city], write entire dict to cache.json
-    pass
+    condition = weather["current"]["condition"]["text"]
+    temp_c = weather["current"]["temp_c"]
+    temp_f = weather["current"]["temp_f"]
+    feelslike_c = weather["current"]["feelslike_c"]
+    humidity = weather["current"]["humidity"]
+    wind_kph = weather["current"]["wind_kph"]
+    wind_dir = weather["current"]["wind_dir"]
+
+    print(f"\nCity: {city}, {region}, {country}")
+    print(f"Local time: {localtime}")
+    print(f"Condition: {condition}")
+    print(f"Temperature: {temp_c} °C ({temp_f} °F)")
+    print(f"Feels like: {feelslike_c} °C")
+    print(f"Humidity: {humidity}%")
+    print(f"Wind: {wind_kph} kph ({wind_dir})\n")
+
+
 
 def load_cached_weather():
     # return contents of cache.json or {} if missing
@@ -57,23 +92,23 @@ def ensure_cache_file():
     
 
 
-
-
-# Main menu and CLI
-def main():
-    ensure_cache_file()
-    cache = load_cached_weather()
+def validate_key():
     while True:
-        
-        key = input("Input your API key.").strip()
+        key = input("Input your API key. ").strip()
         url = f"https://api.weatherapi.com/v1/current.json?key={key}&q=London"
 
         response = requests.get(url)
 
         if response.status_code == 200:
-            break
+            return key
         else:
             print("Invalid API key, try again")
+
+# Main menu and CLI
+def main():
+    ensure_cache_file()
+    cache = load_cached_weather()
+    key = validate_key()
     
     while True:
         print("\nWeather CLI")
@@ -87,25 +122,38 @@ def main():
         choice = input("Select option: ").strip()
 
         if choice == "1":
-            pass
+
+            city = input("Enter the city name ").strip().lower()
+            cached_city = get_cached_city(cache, city)
+
+            if cached_city:
+                print(cached_city)
+
+            else:
+                fetch_weather_data(cache, city, key)
+                cache = load_cached_weather()
+            
 
         elif choice == "2":
-            city = input("Input city name").strip().lower()
+
+            city = input("Input city name ").strip().lower()
             if city in cache:
                 weather = cache[city]
                 display_weather(weather)
                 
             else:
-                input("City is not in cache")
+                print("City is not in cache")
 
         elif choice == "3":
             list_cached_cities(cache)
 
         elif choice == "4":
             
-            city = input("Enter the cached city you would like to delete.").lower().strip()
+            city = input("Enter the cached city you would like to delete. ").lower().strip()
+
             if city in cache:
                 delete_cached_city(cache,city)
+                cache = load_cached_weather()
                 
             else:
                 print("City is not in cache.")
@@ -113,11 +161,13 @@ def main():
 
         elif choice == "5":
             clear_cache()
+            cache = load_cached_weather()
 
         elif choice == "6":
-            pass
+            print("Exiting...")
+            break
         else:
-            pass
+            print("Invalid command.")
 
 
 if __name__ == "__main__":
