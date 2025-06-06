@@ -1,37 +1,29 @@
-weather cli app
-a simple command-line weather tool built in python. fetches current weather data using the weatherapi service. caches results locally in cache.json to reduce api calls and enable offline lookups.
+# Weather CLI App
 
-features
+A simple command-line weather tool built in Python.  
+Fetches current weather data using the WeatherAPI service.  
+Caches results locally in `cache.json` to reduce API calls and enable offline lookups.
 
-get current weather for any city
+## Features
 
-cache weather data
+- Get current weather for any city  
+- Cache weather data  
+- View cached city weather  
+- List all cached cities  
+- Delete individual cached cities  
+- Clear entire cache  
 
-view cached city weather
+## Requirements
 
-list all cached cities
+- Python 3.x  
+- `requests` library  
+- WeatherAPI API key  
 
-delete individual cached cities
+## Usage
 
-clear entire cache
+```bash
+# install dependencies
+pip install requests
 
-requirements
-
-python 3.x
-
-requests library
-
-weatherapi api key
-
-usage
-
-install dependencies: pip install requests
-
-run the script: python script_name.py
-
-enter your api key when prompted
-
-use the menu to interact
-
-notes
-this is a practice project. not intended for production use.
+# run the script
+python script_name.py
